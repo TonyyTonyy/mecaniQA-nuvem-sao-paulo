@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-java-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: java-api
+  template:
+    metadata:
+      labels:
+        app: java-api
+    spec:
+      containers:
+      - name: app-java
+        image: mecaniqa/app-java:latest
+        ports:
+        - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-java-service
+spec:
+  type: NodePort
+  selector:
+    app: java-api
+  ports:
+  - port: 8080
+    targetPort: 8080
+    nodePort: 30080
