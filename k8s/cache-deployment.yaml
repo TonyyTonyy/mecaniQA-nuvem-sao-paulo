@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mecaniqa-cache
+spec:
+  selector:
+    app: mecaniqa-cache
+  ports:
+  - port: 6379
+    targetPort: 6379
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mecaniqa-cache
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mecaniqa-cache
+  template:
+    metadata:
+      labels:
+        app: mecaniqa-cache
+    spec:
+      containers:
+      - name: redis
+        image: mecaniqa-cache:latest
+        ports:
+        - containerPort: 6379
+        volumeMounts:
+        - name: redis-data
+          mountPath: /data
+      volumes:
+      - name: redis-data
+        persistentVolumeClaim:
+          claimName: redis-data-pvc
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: redis-data-pvc
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 512Mi

@@ -14,16 +14,21 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/mecaniqa?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       SPRING_DATASOURCE_USERNAME: mecaniqa_user
       SPRING_DATASOURCE_PASSWORD: password321
-      SPRING_REDIS_HOST: cache
-      SPRING_REDIS_PORT: 6379
+      SPRING_DATA_REDIS_HOST: cache
+      SPRING_DATA_REDIS_PORT: 6379
     depends_on:
-      - db
-      - cache
+      db:
+        condition: service_healthy
+      cache:
+        condition: service_healthy
     networks:
       - mecaniqa-net
 
   db:
-    image: mysql:8.0
+    image: mecaniqa-db:latest
+    build:
+      context: ./db
+      dockerfile: Dockerfile
     container_name: mecaniqa-db
     environment:
       MYSQL_DATABASE: mecaniqa
@@ -34,16 +39,29 @@ services:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pdbpassword321"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - mecaniqa-net
 
   cache:
-    image: redis:alpine
+    image: mecaniqa-cache:latest
+    build:
+      context: ./cache
+      dockerfile: Dockerfile
     container_name: mecaniqa-cache
     ports:
       - "6379:6379"
     volumes:
       - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - mecaniqa-net
 
