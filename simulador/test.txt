@@ -1,0 +1,12 @@
+docker build -t mecaniqa/simulador-iot:1.0 ./simulador
+
+minikube image load mecaniqa/simulador-iot:1.0
+
+kubectl apply -f k8s/
+
+kubectl get pods
+kubectl port-forward svc/prometheus 9090:9090
+
+# Abra http://localhost:9090 → Status > Targets
+
+# Teste a query: rate(iot_leituras_total[1m])

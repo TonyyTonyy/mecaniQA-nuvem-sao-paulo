@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: simulador-iot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: simulador-iot
+  template:
+    metadata:
+      labels:
+        app: simulador-iot
+    spec:
+      containers:
+        - name: simulador-iot
+          image: mecaniqa/simulador-iot:1.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: simulador-iot
+spec:
+  selector:
+    app: simulador-iot
+  ports:
+    - port: 8000
+      targetPort: 8000
