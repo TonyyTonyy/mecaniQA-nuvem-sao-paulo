@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   app:
     image: mecaniqa-api:latest
@@ -35,7 +33,7 @@ services:
       MYSQL_PASSWORD: password321
       MYSQL_ROOT_PASSWORD: dbpassword321
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:

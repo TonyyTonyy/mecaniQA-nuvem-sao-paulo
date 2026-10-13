@@ -1,0 +1,8 @@
+target/
+.git
+.terraform/
+*.tfstate*
+k8s/
+terraform/
+simulador/
+*.pdf

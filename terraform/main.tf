@@ -67,8 +67,21 @@ resource "docker_container" "db" {
 
   ports {
     internal = 3306
-    external = 3306
+    external = 3307
   }
+
+  # Healthcheck: o Terraform so avanca para a API quando o MySQL responder
+  healthcheck {
+    test         = ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${var.mysql_root_password}"]
+    interval     = "10s"
+    timeout      = "5s"
+    retries      = 5
+    start_period = "30s"
+  }
+
+  # Aguarda o container ficar "healthy" antes de considerar o recurso criado
+  wait         = true
+  wait_timeout = 120
 }
 
 resource "docker_container" "cache" {
@@ -88,6 +101,16 @@ resource "docker_container" "cache" {
     internal = 6379
     external = 6379
   }
+
+  healthcheck {
+    test     = ["CMD", "redis-cli", "ping"]
+    interval = "10s"
+    timeout  = "5s"
+    retries  = 5
+  }
+
+  wait         = true
+  wait_timeout = 60
 }
 
 resource "docker_container" "app" {
@@ -108,8 +131,13 @@ resource "docker_container" "app" {
 
   ports {
     internal = 8080
-    external = 8080
+    external = 8081
   }
 
+  # Rede de seguranca: se a API cair (ex.: conexao recusada), tenta subir de novo
+  restart         = "on-failure"
+  max_retry_count = 10
+
+  # Com wait = true nos recursos abaixo, isso espera db e cache ficarem saudaveis
   depends_on = [docker_container.db, docker_container.cache]
 }

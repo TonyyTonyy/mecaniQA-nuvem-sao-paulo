@@ -26,6 +26,7 @@ spec:
       containers:
       - name: redis
         image: mecaniqa-cache:latest
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 6379
         volumeMounts:

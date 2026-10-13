@@ -28,6 +28,7 @@ spec:
       containers:
       - name: mysql
         image: mecaniqa-db:latest
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 3306
         env:

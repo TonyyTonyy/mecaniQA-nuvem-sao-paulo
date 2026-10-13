@@ -1,5 +1,10 @@
 docker build -t mecaniqa/simulador-iot:1.0 ./simulador
 
+# Minikube: carregue as imagens dentro do cluster, uma por uma:
+
+minikube image load mecaniqa-api:latest
+minikube image load mecaniqa-db:latest
+minikube image load mecaniqa-cache:latest
 minikube image load mecaniqa/simulador-iot:1.0
 
 kubectl apply -f k8s/
